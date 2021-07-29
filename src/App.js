@@ -1,32 +1,48 @@
 import { useState } from "react";
 import logo from "./logo.svg";
+import Input from "./Components/Input";
 import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
-	const [locationlat, setLocationLat] = useState(0);
-	const [locationlong, setLocationLong] = useState(0);
-	const success = (pos) => {
-		var crd = pos.coords;
-		setLocationLat(crd.latitude);
-		setLocationLong(crd.longitude);
-	};
-	navigator.geolocation.getCurrentPosition(success);
-
 	const [currentTime, setCurrentTime] = useState("");
 	const [currentTemp, setCurrentTemp] = useState(0);
 	const [currentHumidity, setCurrentHumidity] = useState(0);
 	const [currentWindSpeed, setCurrentWindSpeed] = useState(0);
 
-	const getCurrentInfo = () => {
-		const requestOptions = {
-			method: "GET",
-		};
+	const [dayOneTemp, setDayOneTemp] = useState(0);
+	const [dayOneHumid, setDayOneHumid] = useState(0);
+
+	const getInfo = (lat, lon) => {
 		fetch(
-			`https://api.openweathermap.org/data/2.5/onecall?lat=${locationlat}&lon=${locationlong}&exclude=minutely,hourly,alerts&units=metric&appid=454ee2cac8aed2b3c050d94dacb937b7`
+			`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=454ee2cac8aed2b3c050d94dacb937b7`
 		)
 			.then((response) => response.json())
 			.then((data) => {
-				setCurrentTime(data.current.dt);
+				var currentDate = new Date(data.current.dt * 1000);
+				var months = [
+					"Jan",
+					"Feb",
+					"Mar",
+					"Apr",
+					"May",
+					"Jun",
+					"Jul",
+					"Aug",
+					"Sep",
+					"Oct",
+					"Nov",
+					"Dec",
+				];
+				var year = currentDate.getFullYear();
+				var month = months[currentDate.getMonth()];
+				var date = currentDate.getDate();
+				var hour = currentDate.getHours();
+				var min = currentDate.getMinutes();
+				var sec = currentDate.getSeconds();
+				var time =
+					date + " " + month + " " + year + " " + hour + ":" + min + ":" + sec;
+				setCurrentTime(time);
 				setCurrentTemp(data.current.temp);
 				setCurrentHumidity(data.current.humidity);
 				setCurrentWindSpeed(data.current.wind_speed);
@@ -49,7 +65,7 @@ function App() {
 					Learn React
 				</a>
 			</header>
-			<button type="button" onClick={getCurrentInfo}></button>
+			<Input location={getInfo}></Input>
 		</div>
 	);
 }
