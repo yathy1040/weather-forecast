@@ -1,0 +1,1 @@
+function Current(props) {}
